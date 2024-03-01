@@ -1,0 +1,183 @@
+﻿@implements IDisposable
+@if (allState.ShowCustomer)
+{
+    <div class="continer mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Customers</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddButtonClicked">
+                            <i class="bi bi-plus-circle-dotted"> </i> Add Customer
+                        </button>
+                    </div>
+                    <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        @* <th scope="col">Id</th> *@
+                                        
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Phone No</th>
+                                        <th scope="col">Transaction Date</th>
+                                        <th scope="col">Cashier</th>
+                                        <th scope="col">Payment Type</th>
+                                        <th scope="col">Amount</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Customers is not null)
+                                    {
+                                        int count = 1;
+                                        foreach (var item in Customers)
+                                        {
+                                            <tr>
+                                                <th scope="row">@count</th>
+                                                @* <td>@item.Id</td> *@
+                                                
+                                                <td>@item.Name</td>
+                                                <td>@item.Phone</td>
+                                                <td>@item.TransactionDate</td>
+                                                <td>@item.CreatedBy</td>
+                                                <td>@item.PaymentType!.Name</td>
+                                                <td>@item.Amount</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" id="cursorStyle" @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" id="cursorStyle" @onclick="() => DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info text-center">No Customers added yet!</div></td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="5">&nbsp;</td>
+                                        <td><b>Grand Total:</b></td>
+                                        <td>
+                                            <b>@(string.Format("{0:c}", Customers!.Sum(x => x.Amount)))</b>
+                                         </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    #cursorStyle {
+        cursor: pointer;
+    }
+</style>
+<CustomerDialog @ref="customerDialog"
+                  HandleSaveOperationEvent="HandleSaveOperationEvent"
+                  Customer="Customer"
+                  PaymentTypes="PaymentTypes" />
+
+@code {
+    public string Title { get; set; } = "Add";
+    CustomerDialog? customerDialog;
+    Customer Customer = new();
+    public List<PaymentType> PaymentTypes { get; set; } = new();
+    public List<Customer> Customers { get; set; } = new();
+    protected async override Task OnInitializedAsync()
+    {
+        await GetCustomers();
+        await GetPaymentType();
+        allState.Action += StateHasChanged;
+    }
+
+    private async Task GetCustomers()
+    {
+        Customers = await customerService.GetAll(Constants.CustomerBaseUrl);
+    }
+
+    private async Task GetPaymentType()
+    {
+        PaymentTypes = await paymentTypeService.GetAll(Constants.PaymentBaseUrl);
+    }
+
+    void AddButtonClicked()
+    {
+        customerDialog?.ChangeTitle("Add");
+        Customer = new();
+        OpenDialog();
+    }
+
+    void OpenDialog()
+    {
+        customerDialog?.OpenDialog();
+    }
+
+    private async Task HandleSaveOperationEvent(Customer customer)
+    {
+        bool successCheck = false;
+        if (Customer.Id > 0)
+        {
+            var result = await customerService.Update(customer, Constants.CustomerBaseUrl);
+            successCheck = await DisplayMessage(result.Flag, result.Message);
+        }
+        else
+        {
+            var response = await customerService.Insert(customer, Constants.CustomerBaseUrl);
+            successCheck = await DisplayMessage(response.Flag, response.Message);
+        }
+        if (successCheck)
+        {
+            Customer = new();
+            await GetCustomers();
+            customerDialog?.ChangeTitle("Add");
+        }
+    }
+
+    private void EditClicked(Customer customer)
+    {
+        customerDialog?.ChangeTitle("Update");
+        Customer = customer;
+        OpenDialog();
+    }
+
+    private async Task DeleteClicked(Customer customer)
+    {
+        bool confirm = await dialogService.ConfirmAsync($"Are you sure you wanna delete {customer.Name}?", "Confirm Delete");
+        if (!confirm) return;
+
+        var response = await customerService.DeleteById(customer.Id, Constants.CustomerBaseUrl);
+        var result = await DisplayMessage(response.Flag, response.Message);
+        if (result)
+            await GetCustomers();
+    }
+
+    private async Task<bool> DisplayMessage(bool flag, string message)
+    {
+        if (flag)
+        {
+            await dialogService.AlertAsync(message, "Success Operation");
+            return true;
+        }
+        else
+        {
+            await dialogService.AlertAsync(message, "Alert!");
+            return false;
+        }
+    }
+
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}

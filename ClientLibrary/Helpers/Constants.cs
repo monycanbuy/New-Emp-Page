@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ClientLibrary.Helpers
+{
+    public static class Constants
+    {
+        public const string GeneralDepartmentBaseUrl = "api/generaldepartment";
+        public const string DepartmentBaseUrl = "api/department";
+        public const string BranchBaseUrl = "api/branch";
+        public const string CountryBaseUrl = "api/country";
+        public const string CityBaseUrl = "api/city";
+        public const string StateBaseUrl = "api/state";
+
+        public const string GenderBaseUrl = "api/gender";
+
+        //public const string TownBaseUrl = "api/town";
+        public const string EmployeeBaseUrl = "api/employee";
+
+        // Customer
+        public const string CustomerBaseUrl = "api/customer";
+
+        // Payment Type
+        public const string PaymentBaseUrl = "api/paymenttype";
+
+        public const string DoctorBaseUrl = "api/doctor";
+
+        public const string OvertimeBaseUrl = "api/overtime";
+        public const string OvertimeTypeBaseUrl = "api/overtimetype";
+
+        public const string SanctionTypeBaseUrl = "api/sanctiontype";
+        public const string SanctionBaseUrl = "api/sanction";
+
+        public const string VacationBaseUrl = "api/vacation";
+        public const string VacationTypeBaseUrl = "api/vacationtype";
+    }
+}

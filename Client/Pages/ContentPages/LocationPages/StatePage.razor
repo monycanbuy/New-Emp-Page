@@ -1,0 +1,169 @@
+﻿@implements IDisposable
+@if (allState.ShowState)
+{
+    <div class="continer mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">State</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddButtonClicked">
+                            <i class="bi bi-plus-circle-dotted"> </i> Add State
+                        </button>
+                    </div>
+                    <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Country</th>
+                                        <th scope="col">State</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (States is not null)
+                                    {
+                                        int count = 1;
+                                        foreach (var item in States)
+                                        {
+                                            <tr>
+                                                <th scope="row">@count</th>
+                                                <td>@item.Id</td>
+                                                <td>@item.Country!.Name</td>
+                                                <td>@item.Name</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" id="cursorStyle" @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" id="cursorStyle" @onclick="() => DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info text-center">No State added yet!</div></td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<style>
+    #cursorStyle {
+        cursor: pointer;
+    }
+</style>
+<StateDialog @ref="stateDialog"
+            HandleSaveOperationEvent="HandleSaveOperationEvent"
+            State="State"
+            Countries="Countries" />
+
+@code {
+    public string Title { get; set; } = "Add";
+    StateDialog? stateDialog;
+    State State = new();
+    public List<State> States { get; set; } = new();
+    public List<Country> Countries { get; set; } = new();
+    protected async override Task OnInitializedAsync()
+    {
+        allState.Action += StateHasChanged;
+        await GetStates();
+        await GetCountries();
+        
+    }
+
+    private async Task GetStates()
+    {
+        States = await stateService.GetAll(Constants.StateBaseUrl);
+    }
+
+    private async Task GetCountries()
+    {
+        Countries = await countryService.GetAll(Constants.CountryBaseUrl);
+    }
+
+    void AddButtonClicked()
+    {
+        stateDialog?.ChangeTitle("Add");
+        State = new();
+        OpenDialog();
+    }
+
+    void OpenDialog()
+    {
+        stateDialog?.OpenDialog();
+    }
+
+    private async Task HandleSaveOperationEvent(State state)
+    {
+        bool successCheck = false;
+        if (state.Id > 0)
+        {
+            var result = await stateService.Update(state, Constants.StateBaseUrl);
+            successCheck = await DisplayMessage(result.Flag, result.Message);
+        }
+        else
+        {
+            var response = await stateService.Insert(state, Constants.StateBaseUrl);
+            successCheck = await DisplayMessage(response.Flag, response.Message);
+        }
+        if (successCheck)
+        {
+            State = new();
+            await GetStates();
+            stateDialog?.ChangeTitle("Add");
+        }
+    }
+
+    private void EditClicked(State state)
+    {
+        stateDialog?.ChangeTitle("Update");
+        State = state;
+        OpenDialog();
+    }
+
+    private async Task DeleteClicked(State state)
+    {
+        bool confirm = await dialogService.ConfirmAsync($"Are you sure you wanna delete {state.Name}?", "Confirm Delete");
+        if (!confirm) return;
+
+        var response = await branchService.DeleteById(state.Id, Constants.StateBaseUrl);
+        var result = await DisplayMessage(response.Flag, response.Message);
+        if (result)
+        {
+            await GetStates();
+        }
+    }
+
+    private async Task<bool> DisplayMessage(bool flag, string message)
+    {
+        if (flag)
+        {
+            await dialogService.AlertAsync(message, "Success Operation");
+            return true;
+        }
+        else
+        {
+            await dialogService.AlertAsync(message, "Alert!");
+            return false;
+        }
+    }
+
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}
+

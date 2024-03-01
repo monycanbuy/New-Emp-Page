@@ -1,0 +1,61 @@
+﻿
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-2 cursorStyle">
+            <div class=" card border-primary">
+                <div class="card-header">
+                    <i class="bi bi-people text-primary"></i> Employees
+                    <span class="badge bg-primary fs-6">@* @Employees.Count *@</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 cursorStyle">
+            <div class=" card border-primary">
+                <div class="card-header">
+                    <i class="bi bi-slack text-dark"></i> Dept
+                    <span class="badge bg-primary fs-6">@* @Employees.Count *@</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .cursorStyle {
+        cursor: pointer;
+    }
+</style>
+
+@code {
+
+    // public List<Employee> Employees { get; set; } = new();
+    // public List<Department> Departments { get; set; } = new();
+    // public List<Overtime> Overtimes { get; set; } = new();
+    // public List<Sanction> Sanctions { get; set; } = new();
+    // public List<Vacation> Vacations { get; set; } = new();
+    // public List<Doctor> Health { get; set; } = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        // allState.Action += StateHasChanged;
+        // await LoadDefaults();
+    }
+
+    async Task LoadDefaults()
+    {
+        // Employees = await employeeService.GetAll(Constants.EmployeeBaseUrl);
+        // Departments = await departmentService.GetAll(Constants.DepartmentBaseUrl);
+        // Overtimes = await overtimeService.GetAll(Constants.OvertimeBaseUrl);
+        // Sanctions = await sanctionService.GetAll(Constants.SanctionBaseUrl);
+        // Vacations = await vacationService.GetAll(Constants.VacationBaseUrl);
+        // Health = await doctorService.GetAll(Constants.DoctorBaseUrl);
+    }
+
+
+    // void HealthClicked() => allState.HealthClicked();
+    // void OvertimeClicked() => allState.OvertimeClicked();
+    // void SanctionClicked() => allState.SanctionClicked();
+    // void VacationClicked() => allState.VacationClicked();
+
+    // public void Dispose() => allState.Action -= StateHasChanged;
+}

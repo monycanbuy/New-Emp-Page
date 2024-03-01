@@ -1,0 +1,142 @@
+﻿
+
+@if (allState.ShowCustomer)
+{
+    <SfDialog Width="280px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+        <DialogEvents OnOpen="OpenDialog"> </DialogEvents>
+        <DialogTemplates>
+            <Header> @Title Customers </Header>
+            <Content>
+                <EditForm Model="Customer" Enhance OnSubmit="Save">
+                     <div class="card border-success">
+                         <div class="card-body">
+                             <div class="form-group">
+                        <label class="form-label">Id</label>
+                                 <input @bind="Customer.Id" class="form-control" disabled />
+                        </div>
+                             <div class="form-group">
+                                 <label class="form-label" for="createdby">Created By</label>
+                                 <input  type="text" id="createdby" @bind="createdBy" class="form-control" />
+                                 @* <InputText @bind-Value="Customer.CreatedBy" class="form-control" /> *@
+                             </div>
+                             <div class="form-group">
+                                 <label class="form-label">Customers Name</label>
+                                 <InputText @bind-Value="Customer.Name" class="form-control" />
+                             </div>
+                             <div class="form-group">
+                                 <label class="form-label">Amount</label>
+                                 <InputNumber @bind-Value="Customer.Amount" class="form-control" />
+                             </div>
+                             <div class="form-group">
+                                 <label class="form-label">Phone</label>
+                                 <InputText @bind-Value="Customer.Phone" class="form-control" />
+                             </div>
+                             <div class="form-group mt-3 mb-3">
+                                 <label class="form-label">Select Transaction Type</label>
+                                 @if (Customer.PaymentType != null)
+                                {
+                                    string selected = Customer.PaymentType!.Name!;
+                                    <SfDropDownList TValue="string" TItem="PaymentType" Placeholder="@selected" DataSource="PaymentTypes">
+                                        <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                        <DropDownListEvents TValue="string" TItem="PaymentType" ValueChange="OnValueChange"></DropDownListEvents>
+                                    </SfDropDownList>
+                                }
+                                else
+                                {
+                                    <SfDropDownList TValue="string" TItem="PaymentType" Placeholder="Select Transaction Type" DataSource="PaymentTypes">
+                                        <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                        <DropDownListEvents TValue="string" TItem="PaymentType" ValueChange="OnValueChange"></DropDownListEvents>
+                                    </SfDropDownList>
+                                }
+
+                            </div>
+                            <div class="form-group mt-4">
+                                @if (ShowSpinner)
+                                {
+                                    <ButtonLoadingSpinner/>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary float-end" type="submit">Save</button>
+
+                                }
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                        </div>
+                    </div>
+                </EditForm>
+            </Content>
+        </DialogTemplates>
+
+        @* <DialogButtons>
+    <DialogButton Content="SAVE" Type="ButtonType.Submit" IsPrimary="true" OnClick="Save" />
+    </DialogButtons> *@
+
+    </SfDialog>
+}
+
+@code {
+    [Parameter] 
+    public Customer Customer { get; set; } = new();
+    [Parameter] 
+    public List<PaymentType> PaymentTypes { get; set; } = new();
+    [Parameter] 
+    public EventCallback<Customer> HandleSaveOperationEvent { get; set; }
+
+    private string createdBy;
+    [CascadingParameter]
+    private Task<AuthenticationState> _authState { get; set; }
+    private AuthenticationState authState;
+
+
+    public bool ShowSpinner { get; set; } = false;
+
+    private bool IsVisible { get; set; } = false;
+    public string Title { get; set; } = "Add";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnCreatedMode();
+        allState.Action += StateHasChanged;
+    }
+    private async Task OnCreatedMode()
+    {
+        authState = await _authState;
+        Customer.CreatedBy = createdBy = authState.User.Identity!.Name!;
+    }
+    
+
+    private async void Save()
+    {
+        await OnCreatedMode();
+        if (string.IsNullOrEmpty(Customer.Name) || Customer.PaymentTypeId <= 0)
+        {
+            await dialogService.AlertAsync("You need to provide cusstomer's name.", "Alert!");
+        }
+
+        else
+        {
+            await HandleSaveOperationEvent.InvokeAsync(Customer);
+        }
+
+    }
+
+    public void OpenDialog()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void ChangeTitle(string title)
+    {
+        Title = title;
+    }
+
+    public void OnValueChange(ChangeEventArgs<string, PaymentType> args)
+    {
+        Customer.PaymentTypeId = int.Parse(args.Value);
+    }
+
+    public void Dispose() => allState.Action -= StateHasChanged;
+}

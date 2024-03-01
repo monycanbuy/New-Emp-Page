@@ -1,0 +1,51 @@
+﻿@inherits LayoutComponentBase
+@attribute [Authorize]
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+     <main class="main">
+        
+         <div class="top-row px-4">
+            <ProfileDropDown></ProfileDropDown>
+        </div> 
+        
+      
+         <article class="content px-4">
+            @Body
+        </article> 
+     </main> 
+</div>
+<Syncfusion.Blazor.Popups.SfDialogProvider />
+<style>
+    
+    /* .ralign{
+        margin-left:15px;
+    }
+    a{
+        font-size:15px;
+        font-weight:bold;
+        color:inherit;
+        letter-spacing:-.18px;
+        padding:10px 15px;
+        text-decoration:none;
+        margin-right:10px;
+    }
+    a:hover{
+        color:chocolate
+    } */
+</style>
+@code{
+    public void onBtnClick()
+    {
+        NavManager.NavigateTo("");
+    }
+    async Task LogoutClicked()
+    {
+        var logoutModel = new UserSession();
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(logoutModel);
+        NavManager.NavigateTo("/", forceLoad: true);
+    }
+}

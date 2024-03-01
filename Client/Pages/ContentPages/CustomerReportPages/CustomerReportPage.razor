@@ -1,0 +1,87 @@
+﻿<div class="row">
+    <div class="col-4">
+         <label for="cashier">Cashier Name</label>
+         <input type="text" id="cashier" class="form-control" bind-value="cashierName"/>
+    </div>
+    <div class="col-3">
+        <label for="startdate">Start Date</label>
+        <input type="text" id="startdate" class="form-control" bind-value="startDate" />
+    </div>
+    <div class="col-3">
+        <label for="enddate">End Date</label>
+        <input type="text" id="enddate" class="form-control" bind-value="endDate" />
+    </div>
+    <div class="col-2">
+        <button type="button" class="btn btn-primary" @onclick="LoadCustomers">Search</button>
+    </div>
+</div>
+<br/>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            @* <th scope="col">Id</th> *@
+
+            <th scope="col">Name</th>
+            <th scope="col">Phone No</th>
+            <th scope="col">Transaction Date</th>
+            <th scope="col">Agent Name</th>
+            <th scope="col">Payment Type</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Customers is not null)
+        {
+            int count = 1;
+            foreach (var item in Customers)
+            {
+                <tr>
+                    <th scope="row">@count</th>
+                    @* <td>@item.Id</td> *@
+
+                    <td>@item.Name</td>
+                    <td>@item.Phone</td>
+                    <td>@item.TransactionDate</td>
+                    <td>@item.CreatedBy</td>
+                    <td>@item.PaymentType!.Name</td>
+                    <td>@item.Amount</td>
+                    <td>
+@*                         <i class="bi bi-pencil text-info" id="cursorStyle" @onclick="()=>EditClicked(item)"></i>
+ *@@*                         <i class="bi bi-trash text-danger" id="cursorStyle" @onclick="() => DeleteClicked(item)"></i>
+ *@                    </td>
+                </tr>
+                count++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4"><div class="alert alert-info text-center">No Customers added yet!</div></td>
+            </tr>
+
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5">&nbsp;</td>
+            <td><b>Grand Total:</b></td>
+            <td>
+                <b>@(string.Format("{0:c}", Customers!.Sum(x => x.Amount)))</b>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+@code {
+    private string cashierName;
+    private DateTime startDate;
+    private DateTime endDate;
+    private List<Customer> Customers;
+
+    private void LoadCustomers()
+    {
+        
+    }
+}

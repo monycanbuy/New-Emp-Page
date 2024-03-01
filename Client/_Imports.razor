@@ -1,0 +1,75 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+@using Client
+@using Client.Layout
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Grids.Internal
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using Shared.DTOs
+@using ClientLibrary.Helpers
+@using ClientLibrary.Services.Contract
+@using Client.Pages.OtherPages
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.DropDowns
+@* @using Syncfusion.Blazor.Buttons *@
+@using Client.Pages.ContentPages.DepartmentPages
+@using Client.ApplicationStates
+@using Shared.Entities
+@using Client.Pages.ContentPages.LocationPages
+@using Client.Pages.ContentPages.UserPages
+@using Client.Pages.ContentPages.EmployeePages
+@using Client.Pages.ContentPages.GenderPages
+@using Client.Pages.ContentPages.CustomerPages
+@using System.Security.Claims
+
+
+
+@* /Authentication *@
+@inject IUserAccountService accountService
+
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavManager
+
+@* //Syncfusion Dialog service *@
+@inject SfDialogService dialogService
+
+@inject AllState allState
+
+
+@* /General Departments / Department / Branch *@
+@inject IGenericServiceInterface<GeneralDepartment> generalDepartmentService
+@inject IGenericServiceInterface<Department> departmentService
+@inject IGenericServiceInterface<Branch> branchService
+
+@* /Country / City / Town *@
+@inject IGenericServiceInterface<Country> countryService
+@inject IGenericServiceInterface<State> stateService
+@inject IGenericServiceInterface<City> cityService
+
+@* /Gender *@
+@inject IGenericServiceInterface<Gender> genderService
+
+
+@* //Employee *@
+@inject IGenericServiceInterface<Employee> employeeService
+
+@* //Customer *@
+@inject IGenericServiceInterface<Customer> customerService
+
+@* //PaymentType *@
+@inject IGenericServiceInterface<PaymentType> paymentTypeService
+
+@inject GetHttpClient getHttpClient
+
+@* @inject CustomerProfileState customerProfileState *@
+
+
